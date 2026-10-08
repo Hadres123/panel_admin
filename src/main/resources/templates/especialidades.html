@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Especialidades')}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main>
+    <div th:replace="~{fragments :: avisos}"></div>
+
+    <div class="card" th:if="${form != null}">
+        <h2 th:text="${form.id != null} ? 'Editar especialidad' : 'Nueva especialidad'">Especialidad</h2>
+        <form th:action="@{/especialidades/guardar}" method="post">
+            <input type="hidden" name="id" th:value="${form.id}">
+            <div class="row">
+                <label>Nombre<input name="nombre" required maxlength="100" th:value="${form.nombre}"></label>
+                <label>Precio (S/)<input name="precio" type="number" min="0.01" step="0.01" required th:value="${form.precio}"></label>
+                <label>Descripción<input name="descripcion" maxlength="250" th:value="${form.descripcion}"></label>
+            </div>
+            <div class="acts" style="margin-top:14px">
+                <button class="btn" type="submit">Guardar</button>
+                <a class="btn sec" th:href="@{/especialidades}">Cancelar</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="card">
+        <div class="toolbar">
+            <h2 style="margin:0">Especialidades y precios</h2>
+            <a class="btn" th:href="@{/especialidades(nuevo=1)}">+ Nueva especialidad</a>
+        </div>
+        <div class="scroll">
+            <table>
+                <tr><th>Nombre</th><th>Precio</th><th>Descripción</th><th></th></tr>
+                <tr th:each="e : ${especialidades}">
+                    <td><b th:text="${e.nombre}">Nombre</b></td>
+                    <td th:text="'S/ ' + ${#numbers.formatDecimal(e.precio, 1, 2)}">S/ 0.00</td>
+                    <td class="muted" th:text="${e.descripcion}"></td>
+                    <td>
+                        <div class="acts">
+                            <a class="btn sec sm" th:href="@{/especialidades(editar=${e.id})}">Editar</a>
+                            <form class="inline" th:action="@{/especialidades/{id}/eliminar(id=${e.id})}" method="post"
+                                  onsubmit="return confirm('¿Eliminar esta especialidad?')">
+                                <button class="btn bad sm" type="submit">Eliminar</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(especialidades)}"><td colspan="4" class="muted">Aún no hay especialidades.</td></tr>
+            </table>
+        </div>
+    </div>
+</main>
+</body>
+</html>

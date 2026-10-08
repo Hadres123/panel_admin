@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Sin conexión')}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main>
+    <div class="card">
+        <h2>No se pudo conectar con el backend</h2>
+        <p>El servidor del policlínico no respondió. Si usa el plan gratis de Render, puede estar despertando:
+            espere un minuto y recargue. Si sigue igual, revise las variables
+            <b>BACKEND_URL</b>, <b>BACKEND_USER</b> y <b>BACKEND_PASSWORD</b> de este panel.</p>
+        <a class="btn" th:href="@{/}">Reintentar</a>
+    </div>
+</main>
+</body>
+</html>

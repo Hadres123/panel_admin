@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(titulo)">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title th:text="${titulo} + ' · Panel Policlínico'">Panel Policlínico</title>
+    <link rel="stylesheet" th:href="@{/css/panel.css}">
+</head>
+<body>
+<header th:fragment="nav">
+    <h1>Panel administrador · Policlínico</h1>
+    <nav>
+        <a th:href="@{/}" th:classappend="${activo == 'inicio'} ? 'on'">Inicio</a>
+        <a th:href="@{/doctores}" th:classappend="${activo == 'doctores'} ? 'on'">Doctores</a>
+        <a th:href="@{/horarios}" th:classappend="${activo == 'horarios'} ? 'on'">Horarios</a>
+        <a th:href="@{/especialidades}" th:classappend="${activo == 'especialidades'} ? 'on'">Especialidades</a>
+        <a th:href="@{/citas}" th:classappend="${activo == 'citas'} ? 'on'">Citas</a>
+        <form class="inline" th:action="@{/logout}" method="post">
+            <button class="navbtn" type="submit">Salir</button>
+        </form>
+    </nav>
+</header>
+<div th:fragment="avisos">
+    <div class="aviso ok" th:if="${ok}" th:text="${ok}"></div>
+    <div class="aviso err" th:if="${error}" th:text="${error}"></div>
+</div>
+</body>
+</html>

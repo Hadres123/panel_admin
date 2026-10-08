@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Horarios')}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main>
+    <div th:replace="~{fragments :: avisos}"></div>
+
+    <div class="card" th:if="${form != null}">
+        <h2 th:text="${form.id != null} ? 'Editar horario' : 'Nuevo horario'">Horario</h2>
+        <form th:action="@{/horarios/guardar}" method="post">
+            <input type="hidden" name="id" th:value="${form.id}">
+            <input type="hidden" name="doctorId" th:value="${doctorId}">
+            <div class="row">
+                <label>Día
+                    <select name="dia">
+                        <option th:each="d : ${dias}" th:value="${d.key}" th:text="${d.value}"
+                                th:selected="${d.key == form.diaSemana}"></option>
+                    </select></label>
+                <label>Desde
+                    <input type="time" name="inicio" required
+                           th:value="${form.horaInicio != null} ? ${#strings.substring(form.horaInicio, 0, 5)} : '08:00'"></label>
+                <label>Hasta
+                    <input type="time" name="fin" required
+                           th:value="${form.horaFin != null} ? ${#strings.substring(form.horaFin, 0, 5)} : '13:00'"></label>
+                <label class="check"><input type="checkbox" name="disponible" th:checked="${form.disponible}"> Disponible</label>
+            </div>
+            <div class="acts" style="margin-top:14px">
+                <button class="btn" type="submit">Guardar</button>
+                <a class="btn sec" th:href="@{/horarios(doctorId=${doctorId})}">Cancelar</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="card">
+        <div class="toolbar">
+            <h2 style="margin:0">Horarios semanales</h2>
+            <div class="acts">
+                <form method="get" th:action="@{/horarios}" class="inline">
+                    <select name="doctorId" onchange="this.form.submit()" style="min-width:240px">
+                        <option th:each="d : ${doctores}" th:value="${d.id}" th:text="${d.nombre}"
+                                th:selected="${d.id == doctorId}"></option>
+                    </select>
+                </form>
+                <a class="btn" th:href="@{/horarios(doctorId=${doctorId}, nuevo=1)}" th:if="${doctorId != null}">+ Nuevo horario</a>
+            </div>
+        </div>
+        <div class="scroll">
+            <table>
+                <tr><th>Día</th><th>Horario</th><th>Estado</th><th></th></tr>
+                <tr th:each="h : ${horarios}">
+                    <td><b th:text="${dias[h.diaSemana]} ?: ${h.diaSemana}">Lunes</b></td>
+                    <td th:text="${#strings.substring(h.horaInicio, 0, 5)} + ' – ' + ${#strings.substring(h.horaFin, 0, 5)}">08:00 – 13:00</td>
+                    <td><span class="tag" th:classappend="${h.disponible} ? 'ok' : 'bad'" th:text="${h.disponible} ? 'Disponible' : 'No disponible'">Disponible</span></td>
+                    <td>
+                        <div class="acts">
+                            <a class="btn sec sm" th:href="@{/horarios(doctorId=${doctorId}, editar=${h.id})}">Editar</a>
+                            <form class="inline" th:action="@{/horarios/{id}/eliminar(id=${h.id})}" method="post"
+                                  onsubmit="return confirm('¿Eliminar este horario?')">
+                                <input type="hidden" name="doctorId" th:value="${doctorId}">
+                                <button class="btn bad sm" type="submit">Eliminar</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(horarios)}"><td colspan="4" class="muted">Este doctor no tiene horarios.</td></tr>
+            </table>
+        </div>
+        <p class="muted">La web reserva en turnos de 30 min entre 8:00–12:30 y 15:00–19:30. Un horario fuera de esas franjas no mostrará turnos.</p>
+    </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Doctores')}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main>
+    <div th:replace="~{fragments :: avisos}"></div>
+
+    <div class="card" th:if="${form != null}">
+        <h2 th:text="${form.id != null} ? 'Editar doctor' : 'Nuevo doctor'">Doctor</h2>
+        <form th:action="@{/doctores/guardar}" method="post">
+            <input type="hidden" name="id" th:value="${form.id}">
+            <div class="row">
+                <label>Nombre completo
+                    <input name="nombre" required maxlength="120" th:value="${form.nombre}"></label>
+                <label>Correo (opcional)
+                    <input name="email" type="email" th:value="${form.email}"></label>
+                <label>Especialidad
+                    <select name="especialidadId" required>
+                        <option th:each="e : ${especialidades}" th:value="${e.id}" th:text="${e.nombre}"
+                                th:selected="${form.especialidad != null and form.especialidad.id == e.id}"></option>
+                    </select></label>
+                <label class="check"><input type="checkbox" name="activo" th:checked="${form.activo}"> Activo (visible en la web)</label>
+            </div>
+            <div class="acts" style="margin-top:14px">
+                <button class="btn" type="submit">Guardar</button>
+                <a class="btn sec" th:href="@{/doctores}">Cancelar</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="card">
+        <div class="toolbar">
+            <h2 style="margin:0">Doctores (<span th:text="${#lists.size(doctores)}">0</span>)</h2>
+            <a class="btn" th:href="@{/doctores(nuevo=1)}" th:if="${!#lists.isEmpty(especialidades)}">+ Nuevo doctor</a>
+        </div>
+        <p class="muted" th:if="${#lists.isEmpty(especialidades)}">Primero cree al menos una especialidad.</p>
+        <div class="scroll">
+            <table>
+                <tr><th>Nombre</th><th>Especialidad</th><th>Estado</th><th></th></tr>
+                <tr th:each="d : ${doctores}">
+                    <td><b th:text="${d.nombre}">Nombre</b><br><span class="muted" th:text="${d.email}"></span></td>
+                    <td th:text="${d.especialidad != null} ? ${d.especialidad.nombre} : '—'">Especialidad</td>
+                    <td><span class="tag" th:classappend="${d.activo} ? 'ok' : 'bad'" th:text="${d.activo} ? 'Activo' : 'Inactivo'">Activo</span></td>
+                    <td>
+                        <div class="acts">
+                            <a class="btn sec sm" th:href="@{/doctores(editar=${d.id})}">Editar</a>
+                            <form class="inline" th:action="@{/doctores/{id}/alternar(id=${d.id})}" method="post">
+                                <button class="btn sec sm" type="submit" th:text="${d.activo} ? 'Desactivar' : 'Activar'">Desactivar</button>
+                            </form>
+                            <form class="inline" th:action="@{/doctores/{id}/eliminar(id=${d.id})}" method="post"
+                                  onsubmit="return confirm('¿Eliminar a este doctor y sus horarios?')">
+                                <button class="btn bad sm" type="submit">Eliminar</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(doctores)}"><td colspan="4" class="muted">Aún no hay doctores.</td></tr>
+            </table>
+        </div>
+        <p class="muted">Un doctor con citas registradas no se puede eliminar: use <b>Desactivar</b> y dejará de mostrarse en la web.</p>
+    </div>
+</main>
+</body>
+</html>
